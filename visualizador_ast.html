@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Visualizador Gráfico da AST - Linguagem Vim</title>
+  <!-- Renderizador Graphviz em WebAssembly (Vis.js / viz.js) -->
+  <script src="https://cdn.jsdelivr.net/npm/viz.js@2.1.2/viz.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/viz.js@2.1.2/full.render.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      background: #1e1e2e;
+      color: #cdd6f4;
+    }
+    header {
+      background: #181825;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #313244;
+    }
+    h1 { font-size: 18px; color: #89b4fa; }
+    .toolbar { display: flex; gap: 10px; align-items: center; }
+    button {
+      background: #89b4fa;
+      color: #11111b;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover { background: #b4befe; }
+    .container {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+    .editor-pane {
+      width: 35%;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid #313244;
+      background: #11111b;
+    }
+    .editor-pane textarea {
+      flex: 1;
+      background: #11111b;
+      color: #a6adc8;
+      border: none;
+      padding: 14px;
+      font-family: "Consolas", monospace;
+      font-size: 13px;
+      resize: none;
+      outline: none;
+      line-height: 1.4;
+    }
+    .graph-pane {
+      flex: 1;
+      position: relative;
+      overflow: auto;
+      background: #1e1e2e;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 20px;
+    }
+    #graph svg {
+      max-width: none;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      border-radius: 8px;
+      background: #ffffff;
+      padding: 16px;
+    }
+    .hint {
+      font-size: 12px;
+      color: #6c7086;
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🌳 Visualizador Gráfico da AST (Árvore de Sintaxe Abstrata)</h1>
+    <div class="toolbar">
+      <span class="hint">Cole o código .dot gerado por <code>vim.exe --ast-dot</code> e clique em Atualizar:</span>
+      <button onclick="renderGraph()">Renderizar Árvore</button>
+    </div>
+  </header>
+  <div class="container">
+    <div class="editor-pane">
+      <textarea id="dotInput" placeholder="Cole o código Graphviz (.dot) aqui...">digraph vimAST {
+  rankdir=TB;
+  node [shape=box, style="rounded,filled", fontname="Consolas", fontsize=10];
+  edge [fontname="Consolas", fontsize=9, color="#555555"];
+
+  n1 [label="Program", fillcolor="#dbeafe", color="#2563eb"];
+  n2 [label="FnDecl [fn fatorial(n: int) -> int]", fillcolor="#e0e7ff", color="#4f46e5"];
+  n3 [label="BlockStmt", fillcolor="#fef3c7", color="#d97706"];
+  n4 [label="IfStmt", fillcolor="#fef3c7", color="#d97706"];
+  n5 [label="BinaryExpr (<=)", fillcolor="#dcfce7", color="#16a34a"];
+  n6 [label="IdentExpr \"n\"", fillcolor="#f3f4f6", color="#6b7280"];
+  n7 [label="IntLit 1", fillcolor="#f3f4f6", color="#6b7280"];
+
+  n1 -> n2;
+  n2 -> n3;
+  n3 -> n4;
+  n4 -> n5;
+  n5 -> n6;
+  n5 -> n7;
+}</textarea>
+    </div>
+    <div class="graph-pane" id="graph">
+      <!-- SVG renderizado aqui -->
+    </div>
+  </div>
+
+  <script>
+    const viz = new Viz();
+
+    function renderGraph() {
+      const dot = document.getElementById('dotInput').value;
+      const graphDiv = document.getElementById('graph');
+      viz.renderSVGElement(dot)
+        .then(function(element) {
+          graphDiv.innerHTML = '';
+          graphDiv.appendChild(element);
+        })
+        .catch(function(error) {
+          graphDiv.innerHTML = `<div style="color:#f38ba8; padding:20px;">Erro ao gerar grafo: ${error.message}</div>`;
+        });
+    }
+
+    // Renderiza inicialmente
+    window.onload = renderGraph;
+  </script>
+</body>
+</html>
