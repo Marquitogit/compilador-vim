@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="https://raw.githubusercontent.com/Marquitogit/compilador-vim/main/ast_bubblesort.png" alt="Vim AST Logo" width="160" />
-</p>
-
 <h1 align="center">Vim Programming Language & Compiler</h1>
 
 <p align="center">
