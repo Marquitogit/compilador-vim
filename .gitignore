@@ -1,0 +1,9 @@
+# Binários compilados
+vim.exe
+vim
+*.exe
+*.out
+
+# Artefatos Graphviz temporários
+*.svg
+*.png
