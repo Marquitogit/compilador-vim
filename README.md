@@ -295,9 +295,24 @@ go vet ./...
 go test -v ./...
 ```
 
-- **Testes Unitários**: Testam individualmente o analisador léxico, parser de expressões Pratt, checador semântico, gerador de IR e a Stack VM.
-- **Testes Golden de Integração**: Garantem estrita equivalência de saída (*stdout*) entre as execuções com e sem `--opt` em todos os programas válidos.
-- **Testes de Camadas de Erro**: Validação automática de 100% dos cenários em `exemplos/invalidos/`.
+A suíte automatizada cobre:
+- Testes unitários dedicados por pacote (`diagnostics`, `lexer`, `parser`, `semantic`, `ir`, `vm`, `cli`);
+- Suíte de integração ponta a ponta (`examples_test.go`) validando saídas *golden*, equivalência semântica estrita entre `--run` e `--opt --run`, redução comprovada de bytecode e cobertura das 4 camadas de erro (`E00xx`, `E01xx`, `E02xx`, `E03xx`).
+
+### 6.3 Flags da Linha de Comando
+
+| Flag | Descrição |
+| :--- | :--- |
+| `--tokens <arq.vim>` | Executa a Fase 1 (Scanner) e imprime a tabela alinhada de tokens e spans. |
+| `--ast <arq.vim>` | Executa até a Fase 2 e imprime a AST hierárquica indentada (pós-desaçucaramento). |
+| `--ast-dot <arq.vim>` | Exporta a AST no formato Graphviz (`.dot`) para renderização visual em PNG/SVG. |
+| `--no-desugar` | Combinada com `--ast` ou `--ast-dot`, preserva o nó `ForStmt` original antes da reescrita em `while`. |
+| `--check <arq.vim>` | Executa até a Fase 3 e exibe a Tabela de Símbolos Globais e a Hierarquia de Escopos. |
+| `--dump-ir <arq.vim>` | Executa até a Fase 4a e exibe o *disassembly* simbólico completo do bytecode gerado. |
+| `--run <arq.vim>` | Compila e executa o programa na Stack VM (Fase 4b). |
+| `--opt` | Ativa o otimizador seguro de AST (Constant Folding + propagação de `const` + DCE) em `--dump-ir` ou `--run`. |
+| `--stats` | Anexa ao final um painel detalhado de métricas e tempos de alta precisão por fase. |
+| `-h`, `--help` | Exibe o guia rápido de uso da ferramenta. |
 
 ---
 
